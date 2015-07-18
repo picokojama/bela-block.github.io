@@ -12,7 +12,7 @@ $(function() {
     if(localStorage.tim1) ukupnotim1 = Number(localStorage.tim1);
     if(localStorage.tim2) ukupnotim2 = Number(localStorage.tim2);
 
-    // FUNKCIJA ZA ISPIS REZULTATA
+    // FUNKCIJA
     function ispisiRezultat(tim1, tim2) {
         tim1 = Number(tim1);
         tim2 = Number(tim2);
@@ -24,6 +24,26 @@ $(function() {
         } else {
             rezultat.find('mark').text(tim2 - tim1);
         }
+    }
+
+    function oduzmiVrijednost(tim1, tim2) {
+        tim1 = Number(tim1);
+        tim2 = Number(tim2);
+        ukupnotim1 -= tim1;
+        ukupnotim2 -= tim2;
+        localStorage.tim1 = ukupnotim1;
+        localStorage.tim2 = ukupnotim2;
+        ispisiRezultat(ukupnotim1, ukupnotim2);
+    }
+
+    function dodajVrijednost(tim1, tim2) {
+        tim1 = Number(tim1);
+        tim2 = Number(tim2);
+        ukupnotim1 += tim1;
+        ukupnotim2 += tim2;
+        localStorage.tim1 = ukupnotim1;
+        localStorage.tim2 = ukupnotim2;
+        ispisiRezultat(ukupnotim1, ukupnotim2);
     }
 
     // POCETNI SETUP
@@ -65,9 +85,9 @@ $(function() {
         // dodaj red u tablicu
         html = '<tr class="igra">';
         html += '<td>' + broj + '</td>';
-        html += '<td>' + tim1 + '</td>';
-        html += '<td>' + tim2 + '</td>';
-        html += '<td><button class="btn btn-sm btn-danger obrisi" style="margin-right: 5px;">Obriši</button><button class="uredi btn btn-sm btn-warning">Uredi</button></td>';
+        html += '<td class="tim1red">' + tim1 + '</td>';
+        html += '<td class="tim2red">' + tim2 + '</td>';
+        html += '<td><button class="btn btn-sm btn-danger obrisi" data-action="obrisi" style="margin-right: 5px;">Obriši</button><button data-action="azuriraj" class="azuriraj btn btn-sm btn-warning" data-toggle="modal" data-target=".azuriranje">Uredi</button></td>';
         html += '</tr>';
         $(html).insertAfter('tr.table-heading');
 
@@ -88,4 +108,35 @@ $(function() {
         $('tr.igra').remove();
         ispisiRezultat(0, 0);
     });
+
+    // BRISANJE I AZURIRANJE
+
+    action = function(e) {
+        if(e.target == $('button.obrisi')[0] || e.target == $('button.azuriraj')[0]){
+            tipka = $(e.target);
+            red = tipka.parent().parent();
+            tim1 = $(red.find('.tim1red'));
+            tim2 = $(red.find('.tim2red'));
+            if(tipka.data('action') == 'obrisi') {
+                red.remove();
+                oduzmiVrijednost(tim1.text(), tim2.text());
+                broj --;
+            } else {
+                $('.modal .potvrdi').on('click', function() {
+                    tim1a = Number($('#azurirajtim1').val());
+                    tim2a = Number($('#azurirajtim2').val());
+                    zvanjea = Number($('#azurirajzvanje').val());
+                    tima = Number($('#azurirajtim').val());
+                    if(tima == 1) tim1a += zvanjea;
+                    if(tima == 2) tim2a += zvanjea;
+                    oduzmiVrijednost(tim1.text(), tim2.text());
+                    dodajVrijednost(tim1a, tim2a);
+                    tim1.text(tim1a);
+                    tim2.text(tim2a);
+                });
+            }
+        }
+    };
+
+    $('body').on('click', action);
 });
