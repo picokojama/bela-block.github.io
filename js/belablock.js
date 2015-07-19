@@ -2,6 +2,8 @@ var Bela = {
 
     // varijable za pracenje
     broj : 0,
+    ukupnotim1 : 0,
+    ukupnotim2 : 0,
 
     // dom elementi
     vrijednost1 : '',
@@ -23,6 +25,7 @@ var Bela = {
         Bela.razlikaElem = config.razlikaElem;
         Bela.inserting = config.inserting;
         Bela.ucitaj_iz_ls();
+        Bela.ispisiRezultat();
     },
 
     spremi_u_ls : function() {
@@ -38,7 +41,7 @@ var Bela = {
     ispisiRezultat : function() { // ispisi trenutni trzultat
         Bela.ukupno1Elem.text(Bela.ukupnotim1);
         Bela.ukupno2Elem.text(Bela.ukupnotim2);
-        if(tim1 >= tim2) {
+        if(Bela.ukupnotim1 >= Bela.ukupnotim2) {
             Bela.razlikaElem.text(Bela.ukupnotim1 - Bela.ukupnotim2);
         } else {
             Bela.razlikaElem.text(Bela.ukupnotim2 - Bela.ukupnotim1);
@@ -50,6 +53,8 @@ var Bela = {
         tim2 = Number(tim2);
         Bela.ukupnotim1 -= tim1;
         Bela.ukupnotim2 -= tim2;
+        Bela.spremi_u_ls();
+        Bela.ispisiRezultat();
     },
 
     dodajVrijednost : function(tim1, tim2) {
@@ -57,6 +62,8 @@ var Bela = {
         tim2 = Number(tim2);
         Bela.ukupnotim1 += tim1;
         Bela.ukupnotim2 += tim2;
+        Bela.spremi_u_ls();
+        Bela.ispisiRezultat();
     },
 
     izracunajDruguVrijednost : function(prvi, drugi, $this) {
@@ -68,14 +75,14 @@ var Bela = {
             $onaj = prvi;
         }
         value = 181 - Number($ovaj.val());
-        $drugi.val(value);
+        $onaj.val(value);
     },
 
     dobiKrajnjuVrijednost : function(vrijednost1, vrijednost2, zvanje1, zvanje2) {
-        vrijednost1 = typeof vrijednost1 !== 'undefined' ? Number(vrijednost1) : Number(Bela.vrijednost1.val());
-        vrijednost2 = typeof vrijednost2 !== 'undefined' ? Number(vrijednost2) : Number(Bela.vrijednost2.val());
-        zvanje1 = typeof zvanje1 !== 'undefined' ? Number(zvanje1) : Number(Bela.zvanje1.val());
-        zvanje2 = typeof zvanje2 !== 'undefined' ? Number(zvanje2) : Number(Bela.zvanje2.val());
+        vrijednost1 = typeof vrijednost1 !== 'undefined' ? Number(vrijednost1.val()) : Number(Bela.vrijednost1.val());
+        vrijednost2 = typeof vrijednost2 !== 'undefined' ? Number(vrijednost2.val()) : Number(Bela.vrijednost2.val());
+        zvanje1 = typeof zvanje1 !== 'undefined' ? Number(zvanje1.val()) : Number(Bela.zvanje1.val());
+        zvanje2 = typeof zvanje2 !== 'undefined' ? Number(zvanje2.val()) : Number(Bela.zvanje2.val());
         vrijednost1 += zvanje1;
         vrijednost2 += zvanje2;
         Bela.dodajVrijednost(vrijednost1, vrijednost2);
@@ -83,6 +90,7 @@ var Bela = {
     },
 
     dodajRed : function(tim1, tim2, zvanje1, zvanje2) {
+        Bela.broj++;
         vrijednosti = Bela.dobiKrajnjuVrijednost(tim1, tim2, zvanje1, zvanje2);
         html = '<tr class="igra">';
         html += '<td>' + Bela.broj + '</td>';
@@ -103,8 +111,9 @@ var Bela = {
         vrijednosti = Bela.dobiVrijednostiIzReda(red);
         Bela.oduzmiVrijednost(vrijednosti[0], vrijednosti[1]);
         Bela.broj--;
-        red.fadeOut(300);
-        red.remove();
+        red.fadeOut(500, function() {
+            red.remove();
+        });
     },
 
     dobiRedOdTipke : function(tipka) {
@@ -120,6 +129,9 @@ var Bela = {
         Bela.oduzmiVrijednost(stare_vrijednosti[0], stare_vrijednosti[1]);
         nove_vrijednosti = Bela.dobiKrajnjuVrijednost(tim1, tim2, zvanje1, zvanje2);
         Bela.dodajVrijednost(nove_vrijednosti[0], nove_vrijednosti[1]);
+        console.log(stare_vrijednosti);
+        console.log(nove_vrijednosti);
+        Bela.ispisiRezultat();
         return nove_vrijednosti;
     },
 
@@ -130,30 +142,15 @@ var Bela = {
     },
 
     reset : function() {
+        Bela.broj = 0;
         Bela.ukupnotim1 = 0;
         Bela.ukupnotim2 = 0;
+        Bela.spremi_u_ls();
+        Bela.ispisiRezultat();
+    },
+
+    novaIgra : function() {
+        Bela.reset();
+        $('tr.igra').fadeOut(500, function() { $(this).remove(); });
     }
 };
-
-Object.defineProperties(Bela, {
-    ukupnotim1 : {
-        get : function() {
-            return Bela.ukupnotim1;
-        },
-        set : function(value) {
-            Bela.ukupnotim1 = value;
-            Bela.spremi_u_ls();
-            Bela.ispisiRezultat();
-        }
-    },
-    ukupnotim2 : {
-        get : function() {
-            return Bela.ukupnotim2;
-        },
-        set : function(value) {
-            Bela.ukupnotim2 = value;
-            Bela.spremi_u_ls();
-            Bela.ispisiRezultat();
-        }
-    }
-});

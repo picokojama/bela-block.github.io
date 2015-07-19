@@ -14,21 +14,24 @@
     <h1 class="text-center">Bela blok <small>verzija za web</small></h1>
     <div class="igra">
         <br />
-        <form class="form-inline">
-            <div class="form-group">
-                <label for="bodovi1">Bodovi prvog tima</label>
-                <input type="number" value="0" required min="0" max="181" class="form-control" id="bodovi1">
-            </div>
-            <div class="form-group">
-                <label for="bodovi2">Bodovi drugog tima</label>
-                <input type="number" value="0" required min="0" max="181" class="form-control" id="bodovi2">
-            </div>
-            <div class="form-group">
-                <label for="zvanje">Dodatni bodovi</label>
-                <input type="number" required class="form-control" id="zvanje" value="0">
-                Za tim: <select id="tim" class="form-control"><option value="1">1</option><option value="2">2</option></select>
-            </div>
-            <button type="submit" class="btn btn-default">Potvrdi</button>
+        <form class="form-inline text-center">
+                <div class="form-group">
+                    <label for="bodovi1">Bodovi prvog tima</label>
+                    <input type="number" value="0" required min="0" max="181" class="form-control text-center bodovi" id="bodovi1">
+                </div>
+                <div class="form-group">
+                    <label for="bodovi2">Bodovi drugog tima</label>
+                    <input type="number" value="0" required min="0" max="181" class="form-control text-center bodovi" id="bodovi2">
+                </div>
+                <div class="form-group">
+                    <label for="zvanje1">Zvanje prvog tima</label>
+                    <input min="0" max="500" type="number" required class="form-control text-center" id="zvanje1" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="zvanje2">Zvanje drugog tima</label>
+                    <input min="0" max="500" type="number" required class="form-control text-center" id="zvanje2" value="0">
+                </div>
+                <button type="submit" class="btn btn-default">Potvrdi</button>
         </form>
         <br />
         <div class="table-responsive">
@@ -48,7 +51,7 @@
             </table>
         </div>
     </div>
-    <button class="btn btn-primary btn-lg btn-block nova-igra">Nova igra</button>
+    <button class="btn btn-primary btn-lg btn-block nova-igra">Ponovi igru</button>
     <div class="modal fade azuriranje">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -60,18 +63,19 @@
                     <form>
                         <div class="form-group">
                             <label for="azurirajtim1">Bodovi prvog tima</label>
-                            <input type="number" id="azurirajtim1" value="0" required min="0" max="181" class="form-control">
+                            <input type="number" id="azurirajtim1" value="0" required min="0" max="181" class="form-control azurirajtim">
                         </div>
                         <div class="form-group">
                             <label for="azurirajtim2">Bodovi drugog tima</label>
-                            <input type="number" id="azurirajtim2" value="0" required min="0" max="181" class="form-control">
+                            <input type="number" id="azurirajtim2" value="0" required min="0" max="181" class="form-control azurirajtim">
                         </div>
                         <div class="form-group">
-                            <label for="azurirajzvanje">Dodatni bodovi</label>
-                            <input type="number" id="azurirajzvanje" required class="form-control" value="0">
+                            <label for="azurirajzvanje1">Zvanje prvog tima</label>
+                            <input type="number" id="azurirajzvanje1" required class="form-control" value="0">
                         </div>
                         <div class="form-group">
-                            <label for="azurirajtim">Za tim:</label><select id="azurirajtim" class="form-control"><option value="1">1</option><option value="2">2</option></select>
+                            <label for="azurirajzvanje2">Zvanje drugog tima</label>
+                            <input type="number" id="azurirajzvanje2" required class="form-control" value="0">
                         </div>
                     </form>
                 </div>
