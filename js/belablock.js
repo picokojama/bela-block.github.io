@@ -1,142 +1,159 @@
-$(function() {
+var Bela = {
 
-    // DOM ELEMENTI
-    vrijednost1 = $('#bodovi1');
-    vrijednost2 = $('#bodovi2');
+    // varijable za pracenje
+    broj : 0,
 
-    // VARIJALE ZA PRACENJE
-    broj = 0; // broj odigranih partija
-    ukupnotim1 = 0;
-    ukupnotim2 = 0;
-    // ako je pohranjeno u localstorageu, povuci odatle
-    if(localStorage.tim1) ukupnotim1 = Number(localStorage.tim1);
-    if(localStorage.tim2) ukupnotim2 = Number(localStorage.tim2);
+    // dom elementi
+    vrijednost1 : '',
+    vrijednost2 : '',
+    zvanjet1 : '',
+    zvanjet2 : '',
+    ukupno1Elem : '',
+    ukupno2Elem : '',
+    razlikaElem : '',
+    inserting : '',
 
-    // FUNKCIJA
-    function ispisiRezultat(tim1, tim2) {
-        tim1 = Number(tim1);
-        tim2 = Number(tim2);
-        rezultat = $('.rezultat');
-        rezultat.find('.tim1').text(tim1);
-        rezultat.find('.tim2').text(tim2);
+    init : function(config) { // započni
+        Bela.vrijednost1 = config.vrijednost1;
+        Bela.vrijednost2 = config.vrijednost2;
+        Bela.zvanjet1 = config.zvanjet1;
+        Bela.zvanjet2 = config.zvanjet2;
+        Bela.ukupno1Elem = config.ukupno1Elem;
+        Bela.ukupno2Elem = config.ukupno2Elem;
+        Bela.razlikaElem = config.razlikaElem;
+        Bela.inserting = config.inserting;
+        Bela.ucitaj_iz_ls();
+    },
+
+    spremi_u_ls : function() {
+        localStorage.tim1 = Bela.ukupnotim1;
+        localStorage.tim2 = Bela.ukupnotim2;
+    },
+
+    ucitaj_iz_ls : function() {
+        if(localStorage.tim1) Bela.ukupnotim1 = Number(localStorage.tim1);
+        if(localStorage.tim2) Bela.ukupnotim2 = Number(localStorage.tim2);
+    },
+
+    ispisiRezultat : function() { // ispisi trenutni trzultat
+        Bela.ukupno1Elem.text(Bela.ukupnotim1);
+        Bela.ukupno2Elem.text(Bela.ukupnotim2);
         if(tim1 >= tim2) {
-            rezultat.find('mark').text(tim1 - tim2);
+            Bela.razlikaElem.text(Bela.ukupnotim1 - Bela.ukupnotim2);
         } else {
-            rezultat.find('mark').text(tim2 - tim1);
+            Bela.razlikaElem.text(Bela.ukupnotim2 - Bela.ukupnotim1);
         }
-    }
+    },
 
-    function oduzmiVrijednost(tim1, tim2) {
+    oduzmiVrijednost : function(tim1, tim2) {
         tim1 = Number(tim1);
         tim2 = Number(tim2);
-        ukupnotim1 -= tim1;
-        ukupnotim2 -= tim2;
-        localStorage.tim1 = ukupnotim1;
-        localStorage.tim2 = ukupnotim2;
-        ispisiRezultat(ukupnotim1, ukupnotim2);
-    }
+        Bela.ukupnotim1 -= tim1;
+        Bela.ukupnotim2 -= tim2;
+    },
 
-    function dodajVrijednost(tim1, tim2) {
+    dodajVrijednost : function(tim1, tim2) {
         tim1 = Number(tim1);
         tim2 = Number(tim2);
-        ukupnotim1 += tim1;
-        ukupnotim2 += tim2;
-        localStorage.tim1 = ukupnotim1;
-        localStorage.tim2 = ukupnotim2;
-        ispisiRezultat(ukupnotim1, ukupnotim2);
-    }
+        Bela.ukupnotim1 += tim1;
+        Bela.ukupnotim2 += tim2;
+    },
 
-    // POCETNI SETUP
-    ispisiRezultat(ukupnotim1, ukupnotim2);
-
-    // AUTOMATSKI IZRAČUN BODOVA
-    handler = function() {
-        $this = $(this);
-        if($this[0] == vrijednost1[0]) {
-            $drugi = vrijednost2;
+    izracunajDruguVrijednost : function(prvi, drugi, $this) {
+        $ovaj = $this;
+        if($ovaj[0] == prvi[0]) {
+            $onaj = drugi;
         }
-        if($this[0] == vrijednost2[0]) {
-            $drugi = vrijednost1;
+        if($ovaj[0] == drugi[0]) {
+            $onaj = prvi;
         }
-        value = 181 - $this.val();
+        value = 181 - Number($ovaj.val());
         $drugi.val(value);
-    };
+    },
 
-    vrijednost1.on('keyup', handler);
-    vrijednost2.on('keyup', handler);
+    dobiKrajnjuVrijednost : function(vrijednost1, vrijednost2, zvanje1, zvanje2) {
+        vrijednost1 = typeof vrijednost1 !== 'undefined' ? Number(vrijednost1) : Number(Bela.vrijednost1.val());
+        vrijednost2 = typeof vrijednost2 !== 'undefined' ? Number(vrijednost2) : Number(Bela.vrijednost2.val());
+        zvanje1 = typeof zvanje1 !== 'undefined' ? Number(zvanje1) : Number(Bela.zvanje1.val());
+        zvanje2 = typeof zvanje2 !== 'undefined' ? Number(zvanje2) : Number(Bela.zvanje2.val());
+        vrijednost1 += zvanje1;
+        vrijednost2 += zvanje2;
+        Bela.dodajVrijednost(vrijednost1, vrijednost2);
+        return [vrijednost1, vrijednost2]
+    },
 
-    // DODAVANJE PARTIJE
-    $('.igra form').on('submit', function(e) {
-        e.preventDefault();
-
-        // dobi bodove obaju timova
-        tim1 = Number(vrijednost1.val());
-        tim2 = Number(vrijednost2.val());
-        zvanje = Number($('#zvanje').val());
-        tim = $('#tim').val();
-        if(tim == 1) {
-            tim1 += zvanje;
-        }
-        if(tim == 2) {
-            tim2 += zvanje;
-        }
-        broj ++;
-
-        // dodaj red u tablicu
+    dodajRed : function(tim1, tim2, zvanje1, zvanje2) {
+        vrijednosti = Bela.dobiKrajnjuVrijednost(tim1, tim2, zvanje1, zvanje2);
         html = '<tr class="igra">';
-        html += '<td>' + broj + '</td>';
-        html += '<td class="tim1red">' + tim1 + '</td>';
-        html += '<td class="tim2red">' + tim2 + '</td>';
+        html += '<td>' + Bela.broj + '</td>';
+        html += '<td class="tim1red">' + vrijednosti[0] + '</td>';
+        html += '<td class="tim2red">' + vrijednosti[1] + '</td>';
         html += '<td><button class="btn btn-sm btn-danger obrisi" data-action="obrisi" style="margin-right: 5px;">Obriši</button><button data-action="azuriraj" class="azuriraj btn btn-sm btn-warning" data-toggle="modal" data-target=".azuriranje">Uredi</button></td>';
         html += '</tr>';
-        $(html).insertAfter('tr.table-heading');
+        Bela.inserting(html);
+    },
 
-        // izmjeni ukupan rezultat
-        ukupnotim1 += tim1;
-        ukupnotim2 += tim2;
-        localStorage.tim1 = ukupnotim1;
-        localStorage.tim2 = ukupnotim2;
-        ispisiRezultat(ukupnotim1, ukupnotim2);
-    });
+    dobiVrijednostiIzReda : function(red) {
+        tim1 = Number(red.find('td.tim1red').text());
+        tim2 = Number(red.find('td.tim2red').text());
+        return [tim1, tim2];
+    },
 
-    // NOVA IGRA
-    $('.nova-igra').on('click', function() {
-        localStorage.tim1 = 0;
-        localStorage.tim2 = 0;
-        ukupnotim1 = 0;
-        ukupnotim2 = 0;
-        $('tr.igra').remove();
-        ispisiRezultat(0, 0);
-    });
+    makniRed : function(red) {
+        vrijednosti = Bela.dobiVrijednostiIzReda(red);
+        Bela.oduzmiVrijednost(vrijednosti[0], vrijednosti[1]);
+        Bela.broj--;
+        red.fadeOut(300);
+        red.remove();
+    },
 
-    // BRISANJE I AZURIRANJE
+    dobiRedOdTipke : function(tipka) {
+        return tipka.parent().parent();
+    },
 
-    action = function(e) {
-        if(e.target == $('button.obrisi')[0] || e.target == $('button.azuriraj')[0]){
-            tipka = $(e.target);
-            red = tipka.parent().parent();
-            tim1 = $(red.find('.tim1red'));
-            tim2 = $(red.find('.tim2red'));
-            if(tipka.data('action') == 'obrisi') {
-                red.remove();
-                oduzmiVrijednost(tim1.text(), tim2.text());
-                broj --;
-            } else {
-                $('.modal .potvrdi').on('click', function() {
-                    tim1a = Number($('#azurirajtim1').val());
-                    tim2a = Number($('#azurirajtim2').val());
-                    zvanjea = Number($('#azurirajzvanje').val());
-                    tima = Number($('#azurirajtim').val());
-                    if(tima == 1) tim1a += zvanjea;
-                    if(tima == 2) tim2a += zvanjea;
-                    oduzmiVrijednost(tim1.text(), tim2.text());
-                    dodajVrijednost(tim1a, tim2a);
-                    tim1.text(tim1a);
-                    tim2.text(tim2a);
-                });
-            }
+    makniRedOdTipke : function(tipka) {
+        Bela.makniRed(Bela.dobiRedOdTipke(tipka));
+    },
+
+    azuriraj : function(red, tim1, tim2, zvanje1, zvanje2) {
+        stare_vrijednosti = Bela.dobiVrijednostiIzReda(red);
+        Bela.oduzmiVrijednost(stare_vrijednosti[0], stare_vrijednosti[1]);
+        nove_vrijednosti = Bela.dobiKrajnjuVrijednost(tim1, tim2, zvanje1, zvanje2);
+        Bela.dodajVrijednost(nove_vrijednosti[0], nove_vrijednosti[1]);
+        return nove_vrijednosti;
+    },
+
+    azurirajRed : function(red, tim1, tim2, zvanje1, zvanje2) {
+        vrijednosti = Bela.azuriraj(red, tim1, tim2, zvanje1, zvanje2);
+        red.find('td.tim1red').text(vrijednosti[0]);
+        red.find('td.tim2red').text(vrijednosti[1]);
+    },
+
+    reset : function() {
+        Bela.ukupnotim1 = 0;
+        Bela.ukupnotim2 = 0;
+    }
+};
+
+Object.defineProperties(Bela, {
+    ukupnotim1 : {
+        get : function() {
+            return Bela.ukupnotim1;
+        },
+        set : function(value) {
+            Bela.ukupnotim1 = value;
+            Bela.spremi_u_ls();
+            Bela.ispisiRezultat();
         }
-    };
-
-    $('body').on('click', action);
+    },
+    ukupnotim2 : {
+        get : function() {
+            return Bela.ukupnotim2;
+        },
+        set : function(value) {
+            Bela.ukupnotim2 = value;
+            Bela.spremi_u_ls();
+            Bela.ispisiRezultat();
+        }
+    }
 });
